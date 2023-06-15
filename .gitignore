@@ -1,0 +1,7 @@
+backend/app/.env
+.env
+venv
+.idea
+.pytest_cache
+app.env
+test.env

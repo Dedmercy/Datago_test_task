@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  money_tracker_api:
+    container_name: money_tracker_api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/app/.env
+    command: bash -c "cd /code/backend && alembic upgrade head && uvicorn app.app:app --host 0.0.0.0 --port 8080 --reload"
+    ports:
+      - "8080:8080"
+    networks:
+      - money_tracker_network
+    depends_on:
+      - money_tracker_postgres
+    restart: on-failure
+    volumes:
+      - ./:/app
+
+  money_tracker_postgres:
+    image: postgres
+    container_name: money_tracker_postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT_OUT}:${POSTGRES_PORT_IN}
+    networks:
+      money_tracker_network:
+
+
+volumes:
+  postgres_volume: {}
+
+networks:
+  money_tracker_network:
+    driver: "bridge"
